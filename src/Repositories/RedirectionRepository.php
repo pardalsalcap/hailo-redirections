@@ -156,6 +156,35 @@ class RedirectionRepository
             ]);
     }
 
+    public static function dashBoardWidget(Model $redirection): Table
+    {
+        return Table::make('redirections', $redirection)
+            ->title(__('hailo-redirections::hailo-redirections.redirections_table_title'))
+            ->hasEditAction(false)
+            ->hasDeleteAction(false)
+            ->extraField('fix')
+            ->addFilter('pending', function ($query) {
+                return $query->whereNull('fix');
+            }, __("hailo-redirections::hailo-redirections.filter_pending"))
+            ->filterBy('pending')
+            ->schema([
+                TextColumn::make('url')
+                    ->label(__('hailo-redirections::hailo-redirections.field_label_url'))
+                    ->hasUrl(true)
+                    ->url(function ($model) {
+                        return $model->url;
+                    })
+                    ->display(function ($model) {
+                        return $model?->url . '<br />' . $model?->fix;
+                    })
+                    ->openInNewTab(true)
+                ,
+                TextColumn::make('http_status')
+                    ->label(__('hailo-redirections::hailo-redirections.http_status_column'))
+                    ->css('hidden sm:table-cell'),
+            ]);
+    }
+
     /**
      * @throws \Exception
      */
