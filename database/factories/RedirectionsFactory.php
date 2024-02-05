@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Pardalsalcap\HailoRedirections\Models\Redirection;
 
-
 class RedirectionsFactory extends Factory
 {
     protected $model = Redirection::class;
@@ -14,6 +13,7 @@ class RedirectionsFactory extends Factory
     public function definition()
     {
         $url = $this->faker->url;
+
         return [
             'hash' => Hash::make($url),
             'url' => $url,

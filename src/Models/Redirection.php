@@ -18,6 +18,7 @@ use Pardalsalcap\HailoRedirections\Database\Factories\RedirectionsFactory;
 class Redirection extends Model
 {
     use HasFactory;
+
     /**
      * @var array
      */
@@ -26,5 +27,5 @@ class Redirection extends Model
     protected static function newFactory()
     {
         return new RedirectionsFactory();
-}
+    }
 }

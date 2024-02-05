@@ -4,7 +4,6 @@ namespace Pardalsalcap\HailoRedirections\Actions;
 
 use Exception;
 use Lorisleiva\Actions\Concerns\AsAction;
-use Pardalsalcap\Hailo\Repositories\RoleRepository;
 use Pardalsalcap\HailoRedirections\Repositories\RedirectionRepository;
 
 class DestroyRedirection
