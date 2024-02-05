@@ -163,7 +163,7 @@ class RedirectionRepository
             ->extraField('fix')
             ->addFilter('pending', function ($query) {
                 return $query->whereNull('fix');
-            }, __("hailo-redirections::hailo-redirections.filter_pending"))
+            }, __('hailo-redirections::hailo-redirections.filter_pending'))
             ->filterBy('pending')
             ->schema([
                 TextColumn::make('url')
@@ -173,10 +173,9 @@ class RedirectionRepository
                         return $model->url;
                     })
                     ->display(function ($model) {
-                        return $model?->url . '<br />' . $model?->fix;
+                        return $model?->url.'<br />'.$model?->fix;
                     })
-                    ->openInNewTab(true)
-                ,
+                    ->openInNewTab(true),
                 TextColumn::make('http_status')
                     ->label(__('hailo-redirections::hailo-redirections.http_status_column'))
                     ->css('hidden sm:table-cell'),
