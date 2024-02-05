@@ -18,18 +18,23 @@ use Pardalsalcap\HailoRedirections\Models\Redirection;
 use Pardalsalcap\HailoRedirections\Repositories\RedirectionRepository;
 use Throwable;
 
-
 class RedirectionsApp extends Component
 {
-
     use CanDelete, HasActions, HasForms, HasTables;
 
-    public string $action = 'index', $q = "", $redirection_form_title = "";
+    public string $action = 'index';
+
+    public string $q = '';
+
+    public string $redirection_form_title = '';
+
     protected RedirectionRepository $repository;
+
     protected $listeners = [
         'searchUpdated' => 'search',
         'destroyRedirection' => 'destroy',
     ];
+
     protected $queryString = [
         'sort_by' => ['except' => 'id', 'as' => 'sort_by'],
         'sort_direction' => ['except' => ['ASC', 'null'], 'as' => 'sort_direction'],
@@ -44,19 +49,17 @@ class RedirectionsApp extends Component
         $this->setupInitialState();
     }
 
-
     public function hydrate(): void
     {
         $this->repository = new RedirectionRepository();
         $this->setupInitialState();
     }
 
-    public function loadForms (): void
+    public function loadForms(): void
     {
-        $form=$this->form($this->repository->form($this->loadModel()))
+        $form = $this->form($this->repository->form($this->loadModel()))
             ->action($this->action == 'edit' ? 'update' : 'store')
-            ->title($this->redirection_form_title)
-            ;
+            ->title($this->redirection_form_title);
         $this->processFormElements($form, $form->getSchema());
     }
 
@@ -64,7 +67,7 @@ class RedirectionsApp extends Component
     {
         if ($this->action == 'edit') {
             $redirection = Redirection::find($this->register_id);
-            if (!$redirection) {
+            if (! $redirection) {
                 $this->cancel();
                 $this->dispatch('toast-error', ['title' => __('hailo-redirections::hailo-redirections.not_found')]);
             } else {
@@ -73,6 +76,7 @@ class RedirectionsApp extends Component
                 return $redirection;
             }
         }
+
         return new Redirection();
 
     }
@@ -85,8 +89,8 @@ class RedirectionsApp extends Component
             $this->dispatch('toast-success', ['title' => __('hailo-redirections::hailo-redirections.deleted')]);
         } catch (Throwable $e) {
             $this->handleFormException($e, '', __('hailo-redirections::hailo-redirections.not_deleted'));
-            $errors = implode("<br />", $this->getValidationErrors()['']);
-            $this->dispatch('toast-error', ['title' =>$errors]);
+            $errors = implode('<br />', $this->getValidationErrors()['']);
+            $this->dispatch('toast-error', ['title' => $errors]);
         }
     }
 
@@ -120,11 +124,11 @@ class RedirectionsApp extends Component
             DB::commit();
         } catch (Throwable $e) {
             DB::rollBack();
-            $this->handleFormException($e, $form?->getName()??'redirections_form', __('hailo-redirections::hailo-redirections.not_saved'));
+            $this->handleFormException($e, $form?->getName() ?? 'redirections_form', __('hailo-redirections::hailo-redirections.not_saved'));
         }
     }
 
-    public function success (): void
+    public function success(): void
     {
         $this->cancel();
         $this->dispatch('toast-success', ['title' => __('hailo-redirections::hailo-redirections.saved')]);
@@ -140,7 +144,6 @@ class RedirectionsApp extends Component
         $this->loadForms();
     }
 
-
     public function edit($id): void
     {
         $this->register_id = $id;
@@ -148,7 +151,6 @@ class RedirectionsApp extends Component
         $this->setupFormTitle();
         $this->loadForms();
     }
-
 
     public function getPaginationAppends(): array
     {
@@ -162,7 +164,7 @@ class RedirectionsApp extends Component
 
     protected function setupTable(): Table
     {
-        return $this->table("redirections_table", $this->repository->table(new Redirection()))
+        return $this->table('redirections_table', $this->repository->table(new Redirection()))
             ->sortBy($this->sort_by)
             ->sortDirection($this->sort_direction)
             ->search($this->q)
@@ -173,9 +175,9 @@ class RedirectionsApp extends Component
 
     protected function setupFormTitle(): void
     {
-        $this->redirection_form_title = __("hailo-redirections::hailo-redirections.redirection_form_title");
+        $this->redirection_form_title = __('hailo-redirections::hailo-redirections.redirection_form_title');
         if ($this->action === 'edit') {
-            $this->redirection_form_title = __("hailo-redirections::hailo-redirections.redirection_form_title_edit");
+            $this->redirection_form_title = __('hailo-redirections::hailo-redirections.redirection_form_title_edit');
         }
     }
 
@@ -200,7 +202,7 @@ class RedirectionsApp extends Component
 
     protected function nullifyRegisterId(): void
     {
-        $this->register_id = $this->register_id === "null" ? null : $this->register_id;
+        $this->register_id = $this->register_id === 'null' ? null : $this->register_id;
     }
 
     public function render(): View|Factory

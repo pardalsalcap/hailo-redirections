@@ -3,10 +3,10 @@
 namespace Pardalsalcap\HailoRedirections;
 
 use Livewire\Livewire;
+use Pardalsalcap\HailoRedirections\Commands\HailoRedirectionsCommand;
 use Pardalsalcap\HailoRedirections\Livewire\Redirections\RedirectionsApp;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Pardalsalcap\HailoRedirections\Commands\HailoRedirectionsCommand;
 
 class HailoRedirectionsServiceProvider extends PackageServiceProvider
 {
