@@ -52,8 +52,17 @@ php artisan vendor:publish --tag="hailo-redirections-views"
 ## Usage
 
 ```php
-$hailoRedirections = new Pardalsalcap\HailoRedirections();
-echo $hailoRedirections->echoPhrase('Hello, Pardalsalcap!');
+public function render($request, Throwable $e) {
+    if ($e instanceof NotFoundHttpException) {
+        $http_status = $e->getStatusCode();
+        $redirection_repository = new RedirectionRepository();
+        $redirection = $redirection_repository->logError(request()->fullUrl(), $http_status);
+        if (!empty($redirection->fix)) {
+            return redirect($redirection->fix, $redirection->http_status);
+        }
+    }
+    return parent::render($request, $e);
+}
 ```
 
 ## Testing

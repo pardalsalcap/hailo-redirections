@@ -2,8 +2,8 @@
 
 namespace Pardalsalcap\HailoRedirections\Repositories;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Number;
 use Pardalsalcap\Hailo\Forms\Fields\HiddenInput;
 use Pardalsalcap\Hailo\Forms\Fields\SelectInput;
@@ -38,21 +38,16 @@ class RedirectionRepository
         return md5($url);
     }
 
-    public function logError($url, $http_status = 404, $fix = null): void
+    public function logError($url, $http_status = 404, $fix = null): Redirection
     {
-        $arr = [
-            'url' => $url,
-            'http_status' => $http_status,
-            'hash' => $this->hash($url),
-            'fix' => $fix,
-        ];
-        $v = Validator::make($arr, [
-            'hash' => 'required|unique:redirections',
-        ]);
+        $hash = $this->hash($url);
 
-        if (! $v->fails()) {
-            Redirection::create($arr);
-        }
+        Redirection::firstOrCreate(
+            ['hash' => $hash],
+            ['url' => $url, 'http_status' => $http_status, 'hits' => 0]
+        )->increment('hits', 1);
+
+        return Redirection::where('hash', $hash)->first();
     }
 
     public static function form(Model $redirection)
@@ -163,7 +158,7 @@ class RedirectionRepository
             ->extraField('fix')
             ->addFilter('pending', function ($query) {
                 return $query->whereNull('fix');
-            }, __("hailo-redirections::hailo-redirections.filter_pending"))
+            }, __('hailo-redirections::hailo-redirections.filter_pending'))
             ->filterBy('pending')
             ->schema([
                 TextColumn::make('url')
@@ -173,10 +168,9 @@ class RedirectionRepository
                         return $model->url;
                     })
                     ->display(function ($model) {
-                        return $model?->url . '<br />' . $model?->fix;
+                        return $model?->url.'<br />'.$model?->fix;
                     })
-                    ->openInNewTab(true)
-                ,
+                    ->openInNewTab(true),
                 TextColumn::make('http_status')
                     ->label(__('hailo-redirections::hailo-redirections.http_status_column'))
                     ->css('hidden sm:table-cell'),
@@ -184,41 +178,40 @@ class RedirectionRepository
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function destroy(int $redirection_id): bool
     {
         $redirection = Redirection::find($redirection_id);
         if ($redirection) {
             if (! $redirection->delete()) {
-                throw new \Exception(__('hailo-redirections::hailo-redirections.not_deleted'));
+                throw new Exception(__('hailo-redirections::hailo-redirections.not_deleted'));
             }
 
             return true;
         }
-        throw new \Exception(__('hailo-redirections::hailo-redirections.not_found'));
+        throw new Exception(__('hailo-redirections::hailo-redirections.not_found'));
+    }
+
+    protected function saveRedirectionAttributes(Redirection $redirection, array $values): Redirection
+    {
+        $redirection->fill([
+            'url' => $values['url'],
+            'fix' => $values['fix'],
+            'http_status' => $values['http_status'],
+            'hash' => $this->hash($values['url']),
+        ])->save();
+
+        return $redirection;
     }
 
     public function update($values, Redirection $redirection): Redirection
     {
-        $redirection->url = $values['url'];
-        $redirection->fix = $values['fix'];
-        $redirection->http_status = $values['http_status'];
-        $redirection->hash = $this->hash($values['url']);
-        $redirection->save();
-
-        return $redirection;
+        return $this->saveRedirectionAttributes($redirection, $values);
     }
 
     public function store($values): Redirection
     {
-        $redirection = new Redirection();
-        $redirection->url = $values['url'];
-        $redirection->fix = $values['fix'];
-        $redirection->http_status = $values['http_status'];
-        $redirection->hash = $this->hash($values['url']);
-        $redirection->save();
-
-        return $redirection;
+        return $this->saveRedirectionAttributes(new Redirection(), $values);
     }
 }
