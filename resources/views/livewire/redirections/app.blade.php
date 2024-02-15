@@ -10,6 +10,6 @@
    ""=>($action=='index'),
     "lg:col-span-2"=>($action=='edit'),
 ])>
-        <x-hailo::form :form="$redirection_form" :validation="$validation_errors[$redirection_form->getName()]??null" />
+        <x-hailo::form :data="$formData[$redirection_form->getName()]" :form="$redirection_form" :validation="$validation_errors[$redirection_form->getName()]??null" />
     </div>
 </div>
